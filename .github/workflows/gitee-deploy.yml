@@ -4,22 +4,38 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  GITEE_USERNAME: '13777060301'
+  GITEE_NAMESPACE: anonymous_blog
+  GITEE_REPO: gongkao-tiku
+
+permissions:
+  contents: read
+
 jobs:
-  build-and-deploy:
+  sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Node
-        uses: actions/setup-node@v3
+      - name: Checkout full history
+        uses: actions/checkout@v4
         with:
-          node-version: '18'
-          
-      - run: npm install
-      - run: npm run build
-      
-      - name: Deploy to Gitee Pages
-        uses: JamesTider/Publish-to-Gitee-Pages@master
-        with:
-          token: ${{ secrets.GITEE_TOKEN }}
-          path: ./dist
+          fetch-depth: 0
+
+      - name: Mirror repo to Gitee main branch
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          git push -f "https://${GITEE_USERNAME}:${GITEE_TOKEN}@gitee.com/${GITEE_NAMESPACE}/${GITEE_REPO}.git" main:main
+
+      - name: Trigger Gitee Pages rebuild
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          set +e
+          RESP=$(curl -sS -X POST "https://gitee.com/api/v5/repos/${GITEE_NAMESPACE}/${GITEE_REPO}/pages/builds?access_token=${GITEE_TOKEN}")
+          CODE=$?
+          echo "$RESP"
+          if [ $CODE -ne 0 ] || echo "$RESP" | grep -qiE '"error"|"message"'; then
+            echo "::warning::Gitee Pages 重建接口调用失败：请确认已完成实名认证，并已在 Gitee 仓库「服务 -> Gitee Pages」手动启动过 Pages（部署分支 main / 根目录）。首次启用后重新运行本工作流即可。"
+          fi
+          exit 0

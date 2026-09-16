@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 env:
-  GITEE_USERNAME: '13777060301'
-  GITEE_NAMESPACE: anonymous_blog
+  GITEE_USERNAME: 'cxandy'
+  GITEE_NAMESPACE: cxandy
   GITEE_REPO: gongkao-tiku
 
 permissions:

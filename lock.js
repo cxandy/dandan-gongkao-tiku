@@ -3,8 +3,8 @@
 (function () {
   // 两段混淆片段：需运行时重组并还原后与"盐+输入"的摘要比对
   const _SALT = "dandan2026!@#";
-  const _K1 = "b361e0e84d3acb111eb01d1801402041";
-  const _K2 = "6b75bd92aaf98025d5d76e26a8c64b7c";
+  const _K1 = "9ffaf12553608e50145b9387e0bb92c3";
+  const _K2 = "edf4c5b2d4ba7ca2243fd3ea9fab1135";
   const KEY = "dandan_unlocked";
 
   function _deobf(h) {

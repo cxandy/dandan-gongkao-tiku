@@ -30,6 +30,10 @@ jobs:
         run: npm install
       - name: Build with Vite
         run: npm run build
+      - name: Stage static assets into dist
+        run: |
+          cp .nojekyll app.js bank.js course.js data-extra.js data.js lesson.js lock.js personal.js practice.js dist/
+          cp -r data content media dist/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

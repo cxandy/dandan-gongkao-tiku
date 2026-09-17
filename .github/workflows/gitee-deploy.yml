@@ -27,15 +27,11 @@ jobs:
         run: |
           git push -f "https://${GITEE_USERNAME}:${GITEE_TOKEN}@gitee.com/${GITEE_NAMESPACE}/${GITEE_REPO}.git" main:main
 
-      - name: Trigger Gitee Pages rebuild
-        env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
-        run: |
-          set +e
-          RESP=$(curl -sS -X POST "https://gitee.com/api/v5/repos/${GITEE_NAMESPACE}/${GITEE_REPO}/pages/builds?access_token=${GITEE_TOKEN}")
-          CODE=$?
-          echo "$RESP"
-          if [ $CODE -ne 0 ] || echo "$RESP" | grep -qiE '"error"|"message"'; then
-            echo "::warning::Gitee Pages 重建接口调用失败：请确认已完成实名认证，并已在 Gitee 仓库「服务 -> Gitee Pages」手动启动过 Pages（部署分支 main / 根目录）。首次启用后重新运行本工作流即可。"
-          fi
-          exit 0
+      - name: Rebuild Gitee Pages
+        uses: yanglbme/gitee-pages-action@main
+        with:
+          gitee-username: ${{ env.GITEE_USERNAME }}
+          gitee-password: ${{ secrets.GITEE_PASSWORD }}
+          gitee-repo: ${{ env.GITEE_NAMESPACE }}/${{ env.GITEE_REPO }}
+          branch: main
+          https: 'true'
